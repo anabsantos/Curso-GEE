@@ -1,0 +1,36 @@
+//************************************************************
+//Exercício 1
+//Este programa classifica areas verdes e não verdes
+//Inputs
+//Datas de início e final das imagens
+
+var data_inicial = "2017-05-01";
+var data_final = "2017-05-30";
+
+//Importando imagens Landsat 8
+var landsat = ee.ImageCollection("LANDSAT/LC08/C01/T1_SR")
+.filterDate("2017-05-01", "2017-05-31")
+.filterBounds(geometry)
+.median()
+
+//Calculando NDVI
+var ndvi = landsat.normalizedDifference(['B5', 'B4']).rename('NDVI')
+//Plotando
+Map.addLayer(ndvi,imageVisParam,"NDVI")
+
+//********************UTILIZANDO .MAP()***********************
+
+//Função de cálculo do NDVI
+var calcNDVI = function(img) {
+    var addNDVI = img.normalizedDifference(['B5', 'B4']).rename('NDVI');
+    return img.addBands(addNDVI);
+};
+
+//Abrindo, filtrando e aplicando .map() na collection
+var landsat_2 = ee.ImageCollection("LANDSAT/LC08/C01/T1_SR")
+.filterDate("2017-05-01", "2017-05-31")
+.filterBounds(geometry)
+.map(calcNDVI)
+
+var ndvi_2 = landsat_2.select("NDVI").median()
+Map.addLayer(ndvi_2,imageVisParam,"NDVI_2")
